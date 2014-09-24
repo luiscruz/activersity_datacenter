@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib import auth
-from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
 
 # from datacenter.models import User,ActivityLog
 # from datacenter.serializers import UserSerializer, ActivityLogSerializer
@@ -42,7 +42,7 @@ from rest_framework import status
 def login(request): 
     username = request.POST['username']
     password = request.POST['password']
-    user = authenticate(username=username, password=password)
+    user = auth.authenticate(username=username, password=password)
     if user is not None:
         if user.is_active:
             auth.login(request, user)
@@ -65,7 +65,6 @@ def logout(request):
 
 #POST    
 class SensorsDataView(View):
-
     #get data from sensor
     def get(self, request, *args, **kwargs):
         return HttpResponse('Get data!')
@@ -76,9 +75,19 @@ class SensorsDataView(View):
         
 
 #POST
+@login_required
 def create_sensor(request, format = None):
-    return HttpResponse('Create Sensor!', status = status.HTTP_201_CREATED)
+    if request.method == 'POST':
+        description = request.POST.get('description')
+        display_name = request.POST.get('display_name')
+        device_type = request.POST.get('device_type')
+        data_type = request.POST.get('data_type')
+        request.user.sensor_set.create(name = description, display_name = display_name, device_type = device_type, data_type = data_type)
+        return HttpResponse('Create Sensor!', status = status.HTTP_201_CREATED)
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
     
 #POST
 def register_user(request):
     return HttpResponse('Register User!')
+

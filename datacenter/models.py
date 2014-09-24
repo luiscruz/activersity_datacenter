@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 class Sensor(models.Model):
     user = models.ForeignKey(User)
     name = models.CharField(max_length=200)
-    display_name = models.CharField(max_length=200)
-    device_type = models.CharField(max_length=200)
+    display_name = models.CharField(max_length=200, blank=True, null=True)
+    device_type = models.CharField(max_length=200, blank=True, null=True)
     data_type = models.CharField(max_length=200, blank=True, null=True)
 
 class SensorData(models.Model):
