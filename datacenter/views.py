@@ -81,7 +81,6 @@ def create_sensor(request, format = None):
         description = request.POST.get('description')
         display_name = request.POST.get('display_name')
         device_type = request.POST.get('device_type')
-        data_type = request.POST.get('data_type')
         request.user.sensor_set.create(name = description, display_name = display_name, device_type = device_type, data_type = data_type)
         return HttpResponse('Create Sensor!', status = status.HTTP_201_CREATED)
     else:

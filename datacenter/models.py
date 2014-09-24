@@ -9,7 +9,6 @@ class Sensor(models.Model):
     name = models.CharField(max_length=200)
     display_name = models.CharField(max_length=200, blank=True, null=True)
     device_type = models.CharField(max_length=200, blank=True, null=True)
-    data_type = models.CharField(max_length=200, blank=True, null=True)
 
 class SensorData(models.Model):
     sensor = models.ForeignKey(Sensor)
