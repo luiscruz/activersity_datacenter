@@ -66,10 +66,15 @@ class RestApiTests(APITestCase):
         login = self.client.login(username = username, password = password)
         response = self.client.post('/datacenter/sensors.json', {'description': sensor_name})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Response status is not 201')
-        sensor = Sensor.objects.last()
-        self.assertIsNotNone(sensor, 'Sensor was not created')
+        import json
+        data = json.loads(response.content)
+        
+        sensor_id = data.get('sensor').get('id')
+        self.assertIsNotNone(sensor_id, 'Sensor id is not present in response')
+        sensor = Sensor.objects.get(id=sensor_id)
+        self.assertIsNotNone(sensor, 'Sensor with the provided id is not found')
         self.assertEqual(sensor.user, test_user, 'Sensor user is not the authenticated user')
-        self.assertEqual(sensor.name, sensor_name)
+        self.assertEqual(sensor.name, sensor_name, 'Sensor name was not stored')
         
     #def test_register_user(self):
         

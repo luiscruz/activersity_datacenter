@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 
@@ -11,6 +11,10 @@ from rest_framework import mixins
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import status
+
+from rest_framework.renderers import JSONRenderer
+from datacenter.serializers import *
+
 # Create your views here.
 
 # class UserList(generics.ListCreateAPIView):
@@ -81,8 +85,9 @@ def create_sensor(request, format = None):
         description = request.POST.get('description')
         display_name = request.POST.get('display_name')
         device_type = request.POST.get('device_type')
-        request.user.sensor_set.create(name = description, display_name = display_name, device_type = device_type, data_type = data_type)
-        return HttpResponse('Create Sensor!', status = status.HTTP_201_CREATED)
+        sensor = request.user.sensor_set.create(name = description, display_name = display_name, device_type = device_type)
+        sensor_serializer = SensorSerializer(sensor)
+        return JsonResponse(sensor_serializer.to_json(),  status = status.HTTP_201_CREATED)
     else:
         return HttpResponseNotFound('<h1>Page not found</h1>')
     
