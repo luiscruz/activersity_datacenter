@@ -72,11 +72,13 @@ def logout(request):
 class SensorsDataView(View):
     #get data from sensor
     def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return redirect('/login/?next=%s' % request.path)
+        
         pk = kwargs.get('pk')
         sensor = Sensor.objects.get(pk = pk)
         data = SensorDataSetSerializer(sensor).to_json()
-        print data
-        return JsonResponse( data)
+        return JsonResponse(data)
         
     #upload data
     def post(self, request, *args, **kwargs):
