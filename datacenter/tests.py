@@ -4,6 +4,7 @@ from rest_framework import status
 
 import datetime
 from django.utils import timezone
+import json
 
 from datacenter.models import *
 from django.contrib.auth.models import User
@@ -12,6 +13,10 @@ from django.contrib.auth.models import User
 
 def create_user(username, password):
     return User.objects.create_user(username, password = password)
+    
+def create_sensor(user, name):
+    sensor = user.sensor_set.create(name = name)
+    return sensor
 
 class UserMethodTests(TestCase):
     def test_create_user(self):
@@ -53,12 +58,23 @@ class RestApiTests(APITestCase):
         
     def test_get_data_from_sensor(self):
         sensor_id = 1
-        session_id = 'FIXME'
-        response = self.client.get('/datacenter/sensors/'+str(sensor_id)+'/data.json', {'x-session_id': session_id})
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        login = self.client.login(username = username, password = password)
+        sensor_name = 'sensor_test'
+        sensor = create_sensor(test_user, sensor_name)
+        
+        #generate data
+        sensor.sensordata_set.create(created_at = timezone.now(), data = {'a': 2})
+        sensor.sensordata_set.create(created_at = timezone.now(), data = {'a': 4})        
+        
+        response = self.client.get('/datacenter/sensors/'+str(sensor.id)+'/data.json', {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = json.loads(response.content)
+        self.assertEqual(len(data.get('data')), 2)
         
     def test_create_sensor(self):
-        session_id = 'FIXME'
         username = 'teste'
         password = 'password'
         sensor_name = 'sensor_test'
@@ -66,7 +82,6 @@ class RestApiTests(APITestCase):
         login = self.client.login(username = username, password = password)
         response = self.client.post('/datacenter/sensors.json', {'description': sensor_name})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Response status is not 201')
-        import json
         data = json.loads(response.content)
         
         sensor_id = data.get('sensor').get('id')

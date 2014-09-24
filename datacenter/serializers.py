@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from datacenter.models import Sensor
+from datacenter.models import *
 
 # class UserSerializer(serializers.ModelSerializer):
 #     activitylog_set = serializers.PrimaryKeyRelatedField(many=True)
@@ -13,6 +13,20 @@ from datacenter.models import Sensor
 #         model = ActivityLog
 #         fields = ('id', 'data', 'created_at', 'user')
         
+class SensorDataSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = SensorData
+        fields = ('created_at', 'data')
+        
+class SensorDataSetSerializer(serializers.ModelSerializer):
+    data = SensorDataSerializer(many = True, source='sensordata_set')
+    class Meta:
+        model = Sensor
+        fields = ['data']
+        
+    def to_json(self):
+        return self.data
+
 class SensorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sensor
