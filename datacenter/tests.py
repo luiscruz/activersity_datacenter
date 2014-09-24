@@ -10,6 +10,8 @@ from django.contrib.auth.models import User
 
 # Create your tests here.
 
+def create_user(username, password):
+    return User.objects.create(username = username, password = password)
 
 class UserMethodTests(TestCase):
     def test_create_user(self):
@@ -20,13 +22,22 @@ class UserMethodTests(TestCase):
                 
 class RestApiTests(APITestCase):
     def test_login(self):
-        response = self.client.post('/datacenter/login/', {'username': 'username', 'password': 'password_md5'})
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        response = self.client.post('/datacenter/login/', {'username': username, 'password': password})
+        self.assertNotEqual(self.client.session['_auth_user_id'], test_user.pk)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        #self.assertIn('x-session_id', response.data.keys())
+        #self.assertEqual(response.request.user, test_user)
         
     def test_logout(self):
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        self.client.login(username = username, password = password)
         response = self.client.post('/datacenter/logout/', {'x-session_id': 'fixme'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(self.client.session['_auth_user_id'], test_user.pk)
         
     def test_upload_data(self):
         sensor_id = 1
@@ -44,7 +55,6 @@ class RestApiTests(APITestCase):
         session_id = 'FIXME'
         response = self.client.get('/datacenter/sensors.json', {'x-session_id': session_id})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.ass
         
     #def test_register_user(self):
         
