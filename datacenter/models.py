@@ -2,7 +2,6 @@ from django.db import models
 from jsonfield import JSONField
 from django.contrib.auth.models import User
 from django.utils import timezone
-#from datacenter.serializers import *
 
 # Create your models here.
     

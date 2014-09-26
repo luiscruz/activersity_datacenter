@@ -26,12 +26,4 @@ class SensorDataSetSerializer(serializers.ModelSerializer):
         
     def to_dict(self):
         return self.data
-
-class SensorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Sensor
-        fields = ('id', 'name','display_name')
-    
-    def to_dict(self):
-        return {'sensor': self.data}
         

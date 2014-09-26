@@ -93,8 +93,7 @@ class SensorsView(View):
         display_name = request.POST.get('display_name')
         device_type = request.POST.get('device_type')
         sensor = request.user.sensor_set.create(name = description, display_name = display_name, device_type = device_type)
-        sensor_serializer = SensorSerializer(sensor)
-        return JsonResponse(sensor_serializer.to_dict(),  status = status.HTTP_201_CREATED)
+        return JsonResponse({'sensor':sensor.to_dict()},  status = status.HTTP_201_CREATED)
 
 class SensorsDataView(View):
     #get data from sensor
