@@ -5,3 +5,7 @@ djangorestframework
 markdown
 django-filter
 django-social-auth
+
+dj-database-url==0.2.2
+dj-static==0.0.5
+wsgiref==0.1.2
