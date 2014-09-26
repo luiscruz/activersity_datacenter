@@ -154,6 +154,15 @@ def upload_data_for_multiple_sensors(request, format = None):
         return HttpResponseBadRequest()
     
 #POST
-def register_user(request):
-    return HttpResponse('Register User!')
+def register_user(request, format = None):
+    request_data = json.loads(request.body)
+    user_data = request_data.get('user')
+    if user_data is not None:
+        User.objects.create(
+            username = user_data.get('username'),
+            email = user_data.get('email'),
+            first_name = user_data.get('name'),
+            password = user_data.get('password')
+        )
+    return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
 

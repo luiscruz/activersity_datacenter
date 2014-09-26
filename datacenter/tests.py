@@ -169,5 +169,25 @@ class RestApiTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK, 'List sensors did not return 200')
         data = json.loads(response.content)
         self.assertEqual(data.get('sensors')[0].get('id'), sensor.id, 'List sensors did not provide a good response')
-        print response
+        
+    def test_register_user(self):
+        username = 'janjager'
+        password = 'password'
+        import hashlib
+        password_md5 = hashlib.md5( password ).hexdigest()
+        user_data = {
+            "user": {
+                "username": username,
+                "email": "jan@test.nl",
+                "name": "Jan",
+                "surname": "Jager",
+                "password": password_md5,
+                "mobile": "0031612345678"
+            }
+        }
+        json_data = json.dumps(user_data)
+        response = self.client.post('/datacenter/users.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Create user did not return 201')
+        login = self.client.login(username = username, password = password)
+        self.assertTrue(login, 'Could not login registered user.')
         
