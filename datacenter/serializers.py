@@ -24,7 +24,7 @@ class SensorDataSetSerializer(serializers.ModelSerializer):
         model = Sensor
         fields = ['data']
         
-    def to_json(self):
+    def to_dict(self):
         return self.data
 
 class SensorSerializer(serializers.ModelSerializer):
@@ -32,6 +32,6 @@ class SensorSerializer(serializers.ModelSerializer):
         model = Sensor
         fields = ('id', 'name','display_name')
     
-    def to_json(self):
+    def to_dict(self):
         return {'sensor': self.data}
         

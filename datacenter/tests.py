@@ -51,13 +51,79 @@ class RestApiTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_upload_data(self):
-        sensor_id = 1
-        session_id = 'FIXME'
-        response = self.client.post('/datacenter/sensors/'+str(sensor_id)+'/data.json', {'x-session_id': session_id})
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        login = self.client.login(username = username, password = password)
+        sensor_name = 'sensor_test'
+        sensor = create_sensor(test_user, sensor_name)
+        data = {"data":  [
+            {
+                "value": {"x-axis":0.1,"y-axis":0.2,"z-axis":0.3},
+                "date": "1291719228"
+            },
+            {
+                "value": {"x-axis":0.3,"y-axis":0.2,"z-axis":0.5},
+                "date": "1291719229"
+            }
+        ]}
+        
+        json_data = json.dumps(data)
+        response = self.client.post('/datacenter/sensors/'+str(sensor.id)+'/data.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest' )
+        
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(len(sensor.sensordata_set.all()), 2)
+        
+    def test_upload_data_without_date(self):
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        login = self.client.login(username = username, password = password)
+        sensor_name = 'sensor_test'
+        sensor = create_sensor(test_user, sensor_name)
+        data = {"data":  [
+            {
+                "value": {"x-axis":0.1,"y-axis":0.2,"z-axis":0.3},
+            }
+        ]}
+        
+        json_data = json.dumps(data)
+        response = self.client.post('/datacenter/sensors/'+str(sensor.id)+'/data.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest' )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
+    def test_upload_data_for_multiple_sensors(self):
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        login = self.client.login(username = username, password = password)
+        sensor_name = 'sensor_test'
+        sensor = create_sensor(test_user, sensor_name)
+
+        data = {
+          "sensors": [
+            {
+              "data": [
+                {
+                  "value": {"x-axis":0.1,"y-axis":0.2,"z-axis":0.3},
+                  "date": "1291719228"
+                },
+                {
+                  "value": {"x-axis":0.3,"y-axis":0.2,"z-axis":0.5},
+                  "date": "1291719229"
+                }
+              ],
+              "sensor_id": sensor.id
+            }
+          ]
+        }
+        
+        json_data = json.dumps(data)
+        response = self.client.post('/datacenter/sensors/data.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest' )
+        
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(len(sensor.sensordata_set.all()), 2)
+        
     def test_get_data_from_sensor(self):
-        sensor_id = 1
         username = 'teste'
         password = 'password'
         test_user = create_user(username, password)
@@ -91,5 +157,17 @@ class RestApiTests(APITestCase):
         self.assertEqual(sensor.user, test_user, 'Sensor user is not the authenticated user')
         self.assertEqual(sensor.name, sensor_name, 'Sensor name was not stored')
         
-    #def test_register_user(self):
+    def test_list_sensors(self):
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        login = self.client.login(username = username, password = password)
+        sensor_name = 'sensor_test'
+        sensor = create_sensor(test_user, sensor_name)
+        
+        response = self.client.get('/datacenter/sensors', {})
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'List sensors did not return 200')
+        data = json.loads(response.content)
+        self.assertEqual(data.get('sensors')[0].get('id'), sensor.id, 'List sensors did not provide a good response')
+        print response
         
