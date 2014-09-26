@@ -1,0 +1,1 @@
+web: gunicorn activersity_datacenter.wsgi --log-file -
