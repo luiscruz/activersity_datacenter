@@ -171,6 +171,7 @@ def register_user(request, format = None):
     # else:
     print '#############'
     print request.POST
+    print request.body
     print '#############'
     username = request.POST.get('username')
     email = request.POST.get('email')
