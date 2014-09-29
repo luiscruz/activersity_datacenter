@@ -157,23 +157,23 @@ def upload_data_for_multiple_sensors(request, format = None):
 #POST
 @csrf_exempt
 def register_user(request, format = None):
-    if format == 'json':
-        request_data = json.loads(request.body)
-        user_data = request_data.get('user')
-        if user_data is not None:
-            User.objects.create(
-                username = user_data.get('username'),
-                email = user_data.get('email'),
-                first_name = user_data.get('name'),
-                password = user_data.get('password')
-            )
-        return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
-    else:
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        user = User.objects.create(username = username, email = email, password = password)
-        return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
+    # if format == 'json':
+    #     request_data = json.loads(request.body)
+    #     user_data = request_data.get('user')
+    #     if user_data is not None:
+    #         User.objects.create(
+    #             username = user_data.get('username'),
+    #             email = user_data.get('email'),
+    #             first_name = user_data.get('name'),
+    #             password = user_data.get('password')
+    #         )
+    #     return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
+    # else:
+    username = request.POST.get('username')
+    email = request.POST.get('email')
+    password = request.POST.get('password')
+    user = User.objects.create(username = username, email = email, password = password)
+    return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
         
         
     
