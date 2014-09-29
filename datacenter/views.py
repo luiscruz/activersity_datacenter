@@ -169,6 +169,9 @@ def register_user(request, format = None):
     #         )
     #     return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
     # else:
+    print '#############'
+    print request.POST
+    print '#############'
     username = request.POST.get('username')
     email = request.POST.get('email')
     password = request.POST.get('password')

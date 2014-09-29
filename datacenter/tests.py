@@ -192,6 +192,7 @@ class RestApiTests(APITestCase):
         self.assertTrue(login, 'Could not login registered user.')
         
     def test_register_user_html(self):
+
         username = 'janjager'
         password = 'password'
         import hashlib
