@@ -61,7 +61,7 @@ WSGI_APPLICATION = 'activersity_datacenter.wsgi.application'
 
 import dj_database_url
 DATABASES = {
-    'default': dj_database_url.config()
+    'default': dj_database_url.config(default='postgres://cruz@localhost:5432/cruz')
 }
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()

@@ -19,6 +19,7 @@ from django.core import serializers
 from django.core import serializers
 import json
 from datetime import date
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
@@ -154,6 +155,7 @@ def upload_data_for_multiple_sensors(request, format = None):
         return HttpResponseBadRequest()
     
 #POST
+@csrf_exempt
 def register_user(request, format = None):
     request_data = json.loads(request.body)
     user_data = request_data.get('user')
