@@ -21,37 +21,14 @@ import json
 from datetime import date
 from django.views.decorators.csrf import csrf_exempt
 
-# Create your views here.
-
-# class UserList(generics.ListCreateAPIView):
-#     """
-#     List all snippets, or create a new snippet.
-#     """
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#
-# class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#
-# class ActivityLogList(generics.ListCreateAPIView):
-#     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-#     queryset = ActivityLog.objects.all()
-#     serializer_class = ActivityLogSerializer
-#     # def pre_save(self, obj):
-#     #     obj.user = self.request.user
-#
-# class ActivityLogDetail(generics.RetrieveUpdateDestroyAPIView):
-#     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-#     queryset = ActivityLog.objects.all()
-#     serializer_class = ActivityLogSerializer
-#     # def pre_save(self, obj):
-# #         obj.user = self.request.user
-
 #POST
-def login(request): 
-    username = request.POST['username']
-    password = request.POST['password']
+@csrf_exempt
+def login(request, format = None): 
+    print request.body
+    request_data = json.loads(request.body)
+    
+    username = request_data.get('username')
+    password = request_data.get('password')
     user = auth.authenticate(username=username, password=password)
     if user is not None:
         if user.is_active:
@@ -69,7 +46,7 @@ def login(request):
     
 
 #POST    
-def logout(request):
+def logout(request, format = None):
     auth.logout(request)
     return HttpResponse('Logout!')
     
@@ -157,26 +134,15 @@ def upload_data_for_multiple_sensors(request, format = None):
 #POST
 @csrf_exempt
 def register_user(request, format = None):
-    # if format == 'json':
-    #     request_data = json.loads(request.body)
-    #     user_data = request_data.get('user')
-    #     if user_data is not None:
-    #         User.objects.create(
-    #             username = user_data.get('username'),
-    #             email = user_data.get('email'),
-    #             first_name = user_data.get('name'),
-    #             password = user_data.get('password')
-    #         )
-    #     return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
-    # else:
-    print '#############'
-    print request.POST
-    print request.body
-    print '#############'
-    username = request.POST.get('username')
-    email = request.POST.get('email')
-    password = request.POST.get('password')
-    user = User.objects.create(username = username, email = email, password = password)
+    request_data = json.loads(request.body)
+    user_data = request_data.get('user')
+    if user_data is not None:
+        User.objects.create_user(
+            username = user_data.get('username'),
+            email = user_data.get('email'),
+            first_name = user_data.get('name') or '',
+            password = user_data.get('password')
+        )
     return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
         
         

@@ -30,7 +30,9 @@ class RestApiTests(APITestCase):
         username = 'teste'
         password = 'password'
         test_user = create_user(username, password)
-        response = self.client.post('/datacenter/login/', {'username': username, 'password': password})
+        data = {'username': username, 'password': password}
+        json_data = json.dumps(data)
+        response = self.client.post('/datacenter/login.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         #self.assertEqual(response.request.user, test_user)
         
@@ -47,7 +49,7 @@ class RestApiTests(APITestCase):
         test_user = create_user(username, password)
         login = self.client.login(username = username, password = password)
         self.assertTrue(login, 'Could not manually login user.')
-        response = self.client.post('/datacenter/logout/')
+        response = self.client.post('/datacenter/logout')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_upload_data(self):
@@ -173,15 +175,15 @@ class RestApiTests(APITestCase):
     def test_register_user_json(self):
         username = 'janjager'
         password = 'password'
-        import hashlib
-        password_md5 = hashlib.md5( password ).hexdigest()
+        #import hashlib
+        #password_md5 = hashlib.md5( password ).hexdigest()
         user_data = {
             "user": {
                 "username": username,
                 "email": "jan@test.nl",
                 "name": "Jan",
                 "surname": "Jager",
-                "password": password_md5,
+                "password": password,
                 "mobile": "0031612345678"
             }
         }
@@ -190,17 +192,19 @@ class RestApiTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Create user did not return 201')
         login = self.client.login(username = username, password = password)
         self.assertTrue(login, 'Could not login registered user.')
-        
-    def test_register_user_html(self):
 
+    def test_register_user_with_minimum_fields_json(self):
         username = 'janjager'
         password = 'password'
         import hashlib
         password_md5 = hashlib.md5( password ).hexdigest()
-        email = "jan@test.nl"
-        
-        response = self.client.post('/datacenter/users', {'username': username, 'password': password_md5, 'email': email})
+        user_data = {
+            "user": {
+                "username": username,
+                "email": "jan@test.nl",
+                "password": password_md5,
+            }
+        }
+        json_data = json.dumps(user_data)
+        response = self.client.post('/datacenter/users.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Create user did not return 201')
-        login = self.client.login(username = username, password = password)
-        self.assertTrue(login, 'Could not login registered user.')
-        
