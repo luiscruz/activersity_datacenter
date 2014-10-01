@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse, HttpResponseBadRequest
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
 from django.contrib.sessions.models import Session
 
 # from datacenter.models import User,ActivityLog
@@ -54,6 +56,10 @@ def logout(request, format = None):
     
     
 class SensorsView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(SensorsView, self).dispatch(*args, **kwargs)
+        
     #list_sensors
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
@@ -76,6 +82,10 @@ class SensorsView(View):
         return JsonResponse({'sensor':sensor.to_dict()},  status = status.HTTP_201_CREATED)
 
 class SensorsDataView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(SensorsDataView, self).dispatch(*args, **kwargs)
+    
     #get data from sensor
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
@@ -111,6 +121,7 @@ class SensorsDataView(View):
         else:
             return HttpResponseBadRequest()
 
+@csrf_exempt
 @login_required
 def upload_data_for_multiple_sensors(request, format = None):
     request_data = json.loads(request.body).get('sensors')#request.POST.getlist('data')
