@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse, HttpResponseBadRequest
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.contrib.sessions.models import Session
 
 # from datacenter.models import User,ActivityLog
 # from datacenter.serializers import UserSerializer, ActivityLogSerializer
@@ -34,7 +35,8 @@ def login(request, format = None):
         if user.is_active:
             auth.login(request, user)
             # Redirect to a success page.
-            return HttpResponse( status = status.HTTP_200_OK)
+            data = {'session_id': request.session.session_key}
+            return JsonResponse(data, status = status.HTTP_200_OK)
         else:
             # Return a 'disabled account' error message
             return HttpResponse( status = status.HTTP_401_UNAUTHORIZED)
@@ -55,7 +57,7 @@ class SensorsView(View):
     #list_sensors
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
-            return redirect('/login/?next=%s' % request.path)
+            return JsonResponse({}, status = status.HTTP_401_UNAUTHORIZED)
         sensors = request.user.sensor_set.all()
         sensors_list = []
         for sensor in sensors:

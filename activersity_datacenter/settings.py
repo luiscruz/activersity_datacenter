@@ -129,3 +129,5 @@ AUTHENTICATION_BACKENDS = (
 FACEBOOK_APP_ID              = '303479466504704'
 FACEBOOK_API_SECRET          = '8887fcf99aabe0810bc539f30c708fd7'
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+SESSION_COOKIE_NAME = 'session_id' #cookie name used by sense API
