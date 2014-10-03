@@ -148,7 +148,10 @@ class RestApiTests(APITestCase):
         sensor_name = 'sensor_test'
         test_user = create_user(username, password)
         login = self.client.login(username = username, password = password)
-        response = self.client.post('/datacenter/sensors.json', {'description': sensor_name})
+        sensor_data = {'sensor': {'name': sensor_name}}
+        json_data = json.dumps(sensor_data)
+        response = self.client.post('/datacenter/sensors.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Response status is not 201')
         data = json.loads(response.content)
         

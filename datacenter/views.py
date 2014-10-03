@@ -62,23 +62,31 @@ class SensorsView(View):
         
     #list_sensors
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
-            return JsonResponse({}, status = status.HTTP_401_UNAUTHORIZED)
+        # if not request.user.is_authenticated():
+        #   return JsonResponse({}, status = status.HTTP_401_UNAUTHORIZED)
         sensors = request.user.sensor_set.all()
         sensors_list = []
         for sensor in sensors:
             sensors_list.append(sensor.to_dict())
         data = {'sensors': sensors_list}
+        print '------'
+        print data
+        print '------'
         return JsonResponse(data)
         
     #create_sensor
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
-            return redirect('/login/?next=%s' % request.path)
-        description = request.POST.get('description')
-        display_name = request.POST.get('display_name')
-        device_type = request.POST.get('device_type')
-        sensor = request.user.sensor_set.create(name = description, display_name = display_name, device_type = device_type)
+            return JsonResponse({}, status = status.HTTP_401_UNAUTHORIZED)
+        request_data = json.loads(request.body).get('sensor')#request.POST.getlist('data')  
+        print '------'
+        print json.loads(request.body)
+        print '------'
+        name = request_data.get('name')
+        display_name = request_data.get('display_name')
+        device_type = request_data.get('device_type')
+        device = request_data.get('device')
+        sensor = request.user.sensor_set.create(name = name, display_name = display_name, device_type = device_type, device = device)
         return JsonResponse({'sensor':sensor.to_dict()},  status = status.HTTP_201_CREATED)
 
 class SensorsDataView(View):
@@ -124,8 +132,8 @@ class SensorsDataView(View):
 @csrf_exempt
 @login_required
 def upload_data_for_multiple_sensors(request, format = None):
+    print 'upload_data_for_multiple_sensors'
     request_data = json.loads(request.body).get('sensors')#request.POST.getlist('data')
-    
     if request_data is not None:
         for sensor_data in request_data:
             sensor_id = sensor_data.get('sensor_id')
