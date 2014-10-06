@@ -31,3 +31,6 @@ class SensorData(models.Model):
     sensor = models.ForeignKey(Sensor)
     created_at = models.DateTimeField(default=timezone.now) #sensor read this value at this time
     data = JSONField()
+
+# class SensorData(models.Device):
+#

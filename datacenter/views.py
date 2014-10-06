@@ -27,7 +27,6 @@ from django.views.decorators.csrf import csrf_exempt
 #POST
 @csrf_exempt
 def login(request, format = None): 
-    print request.body
     request_data = json.loads(request.body)
     
     username = request_data.get('username')
@@ -69,9 +68,6 @@ class SensorsView(View):
         for sensor in sensors:
             sensors_list.append(sensor.to_dict())
         data = {'sensors': sensors_list}
-        print '------'
-        print data
-        print '------'
         return JsonResponse(data)
         
     #create_sensor
@@ -79,15 +75,14 @@ class SensorsView(View):
         if not request.user.is_authenticated():
             return JsonResponse({}, status = status.HTTP_401_UNAUTHORIZED)
         request_data = json.loads(request.body).get('sensor')#request.POST.getlist('data')  
-        print '------'
-        print json.loads(request.body)
-        print '------'
         name = request_data.get('name')
         display_name = request_data.get('display_name')
         device_type = request_data.get('device_type')
         device = request_data.get('device')
         sensor = request.user.sensor_set.create(name = name, display_name = display_name, device_type = device_type, device = device)
-        return JsonResponse({'sensor':sensor.to_dict()},  status = status.HTTP_201_CREATED)
+        response = JsonResponse({'sensor':sensor.to_dict()},  status = status.HTTP_201_CREATED)
+        response['Location'] = 'http://localhost:8000/datacenter/sensors/'+str(sensor.id)
+        return response
 
 class SensorsDataView(View):
     @method_decorator(csrf_exempt)
