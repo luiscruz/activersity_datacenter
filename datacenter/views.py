@@ -24,6 +24,7 @@ import json
 from datetime import date
 from django.views.decorators.csrf import csrf_exempt
 
+
 #POST
 @csrf_exempt
 def login(request, format = None): 
@@ -161,6 +162,15 @@ def register_user(request, format = None):
         )
     return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
         
+@csrf_exempt 
+def sensor_device(request, pk, format = None):
+    if request.method == 'POST':
+        request_data = json.loads(request.body)
+        device_data = request_data.get('device')
+        sensor = Sensor.objects.get(pk = pk)
+        device_type = device_data.get('type')
+        device_uuid = device_data.get('uuid')
+        device = sensor.set_device(device_type = device_type, uuid = device_uuid)
+        return JsonResponse({'device': device.to_dict()}, status=status.HTTP_201_CREATED)
         
-    
-
+        

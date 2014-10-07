@@ -211,3 +211,25 @@ class RestApiTests(APITestCase):
         json_data = json.dumps(user_data)
         response = self.client.post('/datacenter/users.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Create user did not return 201')
+        
+    def test_add_sensor_to_device(self):
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        login = self.client.login(username = username, password = password)
+        sensor_name = 'sensor_test'
+        sensor = create_sensor(test_user, sensor_name)
+        
+        device_type = 'iPhone Simulator'
+        device_uuid = '620A033F-4738-4319-AAC8-0F27B310AA82'
+        request_data = {'device': {'type': device_type, 'uuid': device_uuid}}
+        json_data = json.dumps(request_data)
+        
+        response = self.client.post('/datacenter/sensors/'+str(sensor.id)+'/device', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        sensor = Sensor.objects.get(id = sensor.id)
+        
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Create user did not return 201')
+        self.assertIsNotNone(sensor.device)
+        self.assertEqual(sensor.device.uuid, device_uuid)
+        #self.assertEqual(sensor.device_type, '1')
+    

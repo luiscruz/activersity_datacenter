@@ -11,9 +11,11 @@ urlpatterns = patterns('datacenter.views',
     url(r'^login$', login),
     url(r'^logout$', logout),
     url(r'^sensors/(?P<pk>[0-9]+)/data$', SensorsDataView.as_view()),
+    url(r'^sensors/(?P<pk>[0-9]+)/device$', sensor_device),
     url(r'^sensors/data$', upload_data_for_multiple_sensors),
     url(r'^sensors$', SensorsView.as_view()),
     url(r'^users$', register_user),
+    
     
 )
 
