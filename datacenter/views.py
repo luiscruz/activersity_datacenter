@@ -172,5 +172,11 @@ def sensor_device(request, pk, format = None):
         device_uuid = device_data.get('uuid')
         device = sensor.set_device(device_type = device_type, uuid = device_uuid)
         return JsonResponse({'device': device.to_dict()}, status=status.HTTP_201_CREATED)
+    else:
+        print '***********'
+        print "sensor device"
+        print response
+        print response.body
+        print '***********'
         
         
