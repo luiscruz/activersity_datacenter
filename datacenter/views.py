@@ -25,6 +25,10 @@ from datetime import date
 from django.views.decorators.csrf import csrf_exempt
 
 
+#GET
+def test(request, format = None):
+    return HttpResponse('It is fine ;)')
+
 #POST
 @csrf_exempt
 def login(request, format = None): 

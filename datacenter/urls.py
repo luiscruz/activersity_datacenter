@@ -15,7 +15,7 @@ urlpatterns = patterns('datacenter.views',
     url(r'^sensors/data$', upload_data_for_multiple_sensors),
     url(r'^sensors$', SensorsView.as_view()),
     url(r'^users$', register_user),
-    
+    url(r'^test$', test),
     
 )
 
