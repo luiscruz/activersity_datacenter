@@ -40,7 +40,7 @@ class Sensor(models.Model):
             return None
     
     def to_dict(self):
-        return {
+        instance_dict = {
             'id': self.id,
             'name': self.name, 
             'device_type': self.device_type,
@@ -52,6 +52,9 @@ class Sensor(models.Model):
              "data_type": self.data_type,
              "data_structure":  {"x-axis":"float","y-axis":"float","z-axis":"float"}
         }
+        if self.device is not None:
+            instance_dict['device'] = self.device.to_dict();
+        return instance_dict
     
 class SensorData(models.Model):
     sensor = models.ForeignKey(Sensor)

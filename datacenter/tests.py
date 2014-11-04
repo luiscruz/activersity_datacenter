@@ -17,6 +17,10 @@ def create_user(username, password):
 def create_sensor(user, name):
     sensor = user.sensor_set.create(name = name)
     return sensor
+def create_device(device_type, device_uuid):
+    device = Device.objects.create(device_type = device_type, uuid = device_uuid)
+    return device
+
 
 class UserMethodTests(TestCase):
     def test_create_user(self):
@@ -199,6 +203,27 @@ class RestApiTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK, 'List sensors did not return 200')
         data = json.loads(response.content)
         self.assertEqual(data.get('sensors')[0].get('id'), sensor.id, 'List sensors did not provide a good response')
+        
+    def test_list_sensors_with_device(self):
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        self.client.login(username = username, password = password)
+        sensor_name = 'sensor_test'
+        sensor = create_sensor(test_user, sensor_name)
+        device_type = 'iPhone Simulator'
+        device_uuid = '620A033F-4738-4319-AAC8-0F27B310AA82'
+        device = create_device(device_type, device_uuid)
+        device.sensor_set.add(sensor)
+        
+        response = self.client.get('/datacenter/sensors', {})
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'List sensors did not return 200')
+        data = json.loads(response.content)
+        retrieved_sensor_data = data.get('sensors')[0]
+        retrieved_sensor_device_data = retrieved_sensor_data.get('device')
+        self.assertIsNotNone(retrieved_sensor_device_data, 'List sensors did not include device information')
+        self.assertEqual(retrieved_sensor_device_data.get('uuid'), device_uuid)
+        
         
     def test_register_user_json(self):
         username = 'janjager'
