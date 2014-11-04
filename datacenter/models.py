@@ -23,7 +23,8 @@ class Sensor(models.Model):
     device = models.ForeignKey(Device, null=True)
     name = models.CharField(max_length=200)
     display_name = models.CharField(max_length=200, blank=True, null=True)
-    device_type = models.CharField(max_length=200, blank=True, null=True)        
+    device_type = models.CharField(max_length=200, blank=True, null=True)   
+    data_type = models.CharField(max_length=200, blank=True, null=True)     
     
     def set_device(self, **kwargs):
         device_type = kwargs.get('device_type')
@@ -48,7 +49,7 @@ class Sensor(models.Model):
              "data_type_id": "35445",
              "pager_type": "email",
              "use_data_storage": "1",
-             "data_type": "json",
+             "data_type": self.data_type,
              "data_structure":  {"x-axis":"float","y-axis":"float","z-axis":"float"}
         }
     

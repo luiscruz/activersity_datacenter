@@ -32,6 +32,7 @@ def test(request, format = None):
 #POST
 @csrf_exempt
 def login(request, format = None): 
+
     request_data = json.loads(request.body)
     
     username = request_data.get('username')
@@ -84,7 +85,9 @@ class SensorsView(View):
         display_name = request_data.get('display_name')
         device_type = request_data.get('device_type')
         device = request_data.get('device')
-        sensor = request.user.sensor_set.create(name = name, display_name = display_name, device_type = device_type, device = device)
+        data_type = request_data.get('data_type')
+        
+        sensor = request.user.sensor_set.create(name = name, display_name = display_name, device_type = device_type, device = device, data_type = data_type)
         response = JsonResponse({'sensor':sensor.to_dict()},  status = status.HTTP_201_CREATED)
         response['Location'] = 'http://localhost:8000/datacenter/sensors/'+str(sensor.id)
         return response

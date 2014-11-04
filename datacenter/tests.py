@@ -162,6 +162,31 @@ class RestApiTests(APITestCase):
         self.assertEqual(sensor.user, test_user, 'Sensor user is not the authenticated user')
         self.assertEqual(sensor.name, sensor_name, 'Sensor name was not stored')
         
+    def test_create_sensor_with_data_type_and_device_type(self):
+        username = 'teste'
+        password = 'password'
+        sensor_name = "unread msg"
+        sensor_display_name = "message waiting"
+        sensor_data_type = "bool"
+        sensor_device_type = "unread msg"
+        
+        test_user = create_user(username, password)
+        login = self.client.login(username = username, password = password)
+        sensor_data = {"sensor":{"display_name": sensor_display_name,"pager_type":"","data_type":sensor_data_type,"device_type": sensor_device_type,"name":sensor_name}}
+        json_data = json.dumps(sensor_data)
+        response = self.client.post('/datacenter/sensors.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Response status is not 201')
+        data = json.loads(response.content)
+        
+        sensor_id = data.get('sensor').get('id')
+        self.assertIsNotNone(sensor_id, 'Sensor id is not present in response')
+        sensor = Sensor.objects.get(id=sensor_id)
+        self.assertIsNotNone(sensor, 'Sensor with the provided id is not found')
+        self.assertEqual(sensor.data_type, sensor_data_type)
+        self.assertEqual(sensor.device_type, sensor_device_type)
+        
+    
     def test_list_sensors(self):
         username = 'teste'
         password = 'password'
