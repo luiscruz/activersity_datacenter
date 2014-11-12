@@ -282,4 +282,12 @@ class RestApiTests(APITestCase):
         self.assertIsNotNone(sensor.device)
         self.assertEqual(sensor.device.uuid, device_uuid)
         #self.assertEqual(sensor.device_type, '1')
+        
+    def test_basic_analytics(self):
+        response = self.client.get('/datacenter/basic_analytics', {})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_data_uploaded_per_day(self):
+        response = self.client.get('/datacenter/data_uploaded_per_day', {})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
     

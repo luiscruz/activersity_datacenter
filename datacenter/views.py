@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseNotFound, JsonResponse, HttpRe
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.db.models import Count
 
 from django.contrib.sessions.models import Session
 
@@ -187,3 +188,34 @@ def sensor_device(request, pk, format = None):
         print '***********'
         
         
+        
+############ Analytics ############
+
+def basic_analytics(request, format = None):
+    if request.method == 'GET':
+        import numpy
+        sensors_count = Sensor.objects.count()
+        users_count = User.objects.count()
+        sensors_per_user = numpy.float64(sensors_count)/users_count
+        devices_count = Device.objects.count()
+        devices_per_user = numpy.float64(devices_count)/users_count
+        response_data = {
+            'sensors_count': sensors_count,
+            'users_count': users_count,
+            'sensors_per_user': sensors_per_user,
+            'users_connected': -1,
+            'devices_count': devices_count,
+            'devices_connected': -1,
+            'devices_per_user': devices_per_user,
+            'devices_ios': -1,
+            'devices_android': -1
+        }
+        return JsonResponse(response_data)
+
+def data_uploaded_per_day(request, format = None):
+    if request.method == 'GET':
+        array = SensorData.objects.extra({'created':"date(created_at)"}).values('created_at').annotate(created_count=Count('id')) 
+        return JsonResponse({"data_uploaded_per_day": list(array)})
+        
+
+###################################

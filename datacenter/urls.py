@@ -17,6 +17,10 @@ urlpatterns = patterns('datacenter.views',
     url(r'^users$', register_user),
     url(r'^test$', test),
     
+    ## Analytics ##
+    url(r'^basic_analytics$', basic_analytics),
+    url(r'^data_uploaded_per_day$', data_uploaded_per_day),
+    
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)
