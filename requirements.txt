@@ -13,3 +13,5 @@ gunicorn==18.0
 psycopg2==2.5.1
 
 uwsgi
+
+numpy
