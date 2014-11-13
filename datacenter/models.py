@@ -60,3 +60,36 @@ class SensorData(models.Model):
     sensor = models.ForeignKey(Sensor)
     created_at = models.DateTimeField(default=timezone.now) #sensor read this value at this time
     data = JSONField()
+    
+# Customize User model
+class UserWithExtraMethods(User):
+    def to_dict(self, includeAnalytics = None):
+        instance_dict = {
+            "email": self.email,
+            "username": self.username
+        }
+        if(includeAnalytics):
+            instance_dict['analytics'] = self.analytics()
+        return instance_dict
+        pass
+
+    def data_from_sensor_with_type(self, sensor_device_type):
+        return SensorData.objects.filter(sensor__user_id = self.id).filter(sensor__device_type = sensor_device_type)
+
+    def noise_timeline(self):
+        sensor_data = self.data_from_sensor_with_type('noise_sensor')
+        return list(sensor_data.values('created_at', 'data'))
+
+
+    def analytics(self):
+        return {
+            "devices_count": -1,
+            "sensors_count": self.sensor_set.count(),
+            "noise_timeline": self.noise_timeline(),
+            "position_timeline": [],
+        }
+        pass
+
+    class Meta:
+        proxy=True
+

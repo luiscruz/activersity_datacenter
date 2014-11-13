@@ -156,20 +156,7 @@ def upload_data_for_multiple_sensors(request, format = None):
     else:
         return HttpResponseBadRequest()
     
-#POST
-@csrf_exempt
-def register_user(request, format = None):
-    request_data = json.loads(request.body)
-    user_data = request_data.get('user')
-    if user_data is not None:
-        User.objects.create_user(
-            username = user_data.get('username'),
-            email = user_data.get('email'),
-            first_name = user_data.get('name') or '',
-            password = user_data.get('password')
-        )
-    return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
-        
+
 @csrf_exempt 
 def sensor_device(request, pk, format = None):
     if request.method == 'POST':
@@ -187,6 +174,33 @@ def sensor_device(request, pk, format = None):
         print response.body
         print '***********'
         
+        
+############## Users ##############
+#POST
+@csrf_exempt
+def users(request, format = None):
+    if request.method == 'GET':
+        users = User.objects.all().values()
+        return JsonResponse({"users": list(users)})
+        
+    elif request.method == 'POST':
+        request_data = json.loads(request.body)
+        user_data = request_data.get('user')
+        if user_data is not None:
+            User.objects.create_user(
+                username = user_data.get('username'),
+                email = user_data.get('email'),
+                first_name = user_data.get('name') or '',
+                password = user_data.get('password')
+            )
+        return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
+        
+def users_show(request, user_id, format = None):
+    if request.method == 'GET':
+        user = UserWithExtraMethods.objects.get(id=user_id)
+        return JsonResponse({"user": user.to_dict(True)})
+
+###################################        
         
         
 ############ Analytics ############

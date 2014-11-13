@@ -28,6 +28,40 @@ class UserMethodTests(TestCase):
         user.save()
         user = User.objects.last();
         self.assertEqual([user.first_name, user.last_name], ['Test', 'User'])
+    
+    def test_data_from_sensor_with_type(self):
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        test_user = UserWithExtraMethods.objects.get(id = test_user.id)
+        
+        device_type = 'test_sensor'
+        sensor_one = test_user.sensor_set.create(name = 'test_sensor_one', device_type = device_type)
+        sensor_two = test_user.sensor_set.create(name = 'test_sensor_two', device_type = device_type)
+        sensor_three = test_user.sensor_set.create(name = 'test_sensor_three', device_type = 'other_type')
+        
+        # Data from test_sensor sensors:
+        sensor_one.sensordata_set.create(data = 'test_data')
+        sensor_one.sensordata_set.create(data = 'test_data')
+        sensor_two.sensordata_set.create(data = 'test_data')
+        # Data from 'other_type' sensors:
+        sensor_three.sensordata_set.create(data = 'test_data')
+        
+        sensor_data = test_user.data_from_sensor_with_type(device_type)
+        self.assertIsNotNone(sensor_data)
+        self.assertEqual(sensor_data.count(), 3)
+    def test_noise_timeline(self):
+        test_user = create_user('teste', 'password')
+        test_user = UserWithExtraMethods.objects.get(id = test_user.id)
+        
+        sensor = test_user.sensor_set.create(name = 'test_sensor_one', device_type = 'noise_sensor')
+        sensordata = sensor.sensordata_set.create(data = {"value": -1})
+        
+        timeline = test_user.noise_timeline()
+        self.assertEqual(len(timeline), 1)
+        self.assertEqual(timeline[0] ,{'created_at': sensordata.created_at, 'data':'{"value":-1}'})
+        
+        
                 
 class RestApiTests(APITestCase):
     def test_login(self):
@@ -290,4 +324,16 @@ class RestApiTests(APITestCase):
     def test_data_uploaded_per_day(self):
         response = self.client.get('/datacenter/data_uploaded_per_day', {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_users(self):
+        response = self.client.get('/datacenter/users', {})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_users_show(self):
+        username = 'teste'
+        password = 'password'  
+        test_user = create_user(username, password)
+        response = self.client.get('/datacenter/users/'+str(test_user.id), {})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
     
