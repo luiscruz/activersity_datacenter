@@ -23,7 +23,9 @@ from django.core import serializers
 from django.core import serializers
 import json
 from datetime import date
+from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
+
 
 
 #GET
@@ -204,6 +206,23 @@ def users_show(request, user_id, format = None):
         
         
 ############ Analytics ############
+def get_users_connected():
+    # Query all non-expired sessions
+    sessions = Session.objects.filter(expire_date__gte=datetime.now())
+    uid_list = []
+
+    # Build a list of user ids from that query
+    for session in sessions:
+        data = session.get_decoded()
+        uid_list.append(data.get('_auth_user_id', None))
+    
+    # Query all logged in users based on id list
+    return User.objects.filter(id__in=uid_list)
+    
+def get_users_connected_count():
+    # Query all non-expired sessions
+    sessions = Session.objects.filter(expire_date__gte=datetime.now())
+    return sessions.count()
 
 def basic_analytics(request, format = None):
     if request.method == 'GET':
@@ -217,7 +236,7 @@ def basic_analytics(request, format = None):
             'sensors_count': sensors_count,
             'users_count': users_count,
             'sensors_per_user': sensors_per_user,
-            'users_connected': -1,
+            'users_connected': get_users_connected().count(),
             'devices_count': devices_count,
             'devices_connected': -1,
             'devices_per_user': devices_per_user,

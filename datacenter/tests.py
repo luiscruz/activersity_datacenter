@@ -50,6 +50,7 @@ class UserMethodTests(TestCase):
         sensor_data = test_user.data_from_sensor_with_type(device_type)
         self.assertIsNotNone(sensor_data)
         self.assertEqual(sensor_data.count(), 3)
+        
     def test_noise_timeline(self):
         test_user = create_user('teste', 'password')
         test_user = UserWithExtraMethods.objects.get(id = test_user.id)
@@ -60,7 +61,6 @@ class UserMethodTests(TestCase):
         timeline = test_user.noise_timeline()
         self.assertEqual(len(timeline), 1)
         self.assertEqual(timeline[0] ,{'created_at': sensordata.created_at, 'data':'{"value":-1}'})
-        
         
                 
 class RestApiTests(APITestCase):
@@ -320,6 +320,20 @@ class RestApiTests(APITestCase):
     def test_basic_analytics(self):
         response = self.client.get('/datacenter/basic_analytics', {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = json.loads(response.content)
+        users_connected = data.get('users_connected')
+        self.assertEqual(users_connected, 0)
+        
+        
+    def test_basic_analytics_users_connected(self):
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        login = self.client.login(username = username, password = password)
+        response = self.client.get('/datacenter/basic_analytics', {})
+        data = json.loads(response.content)
+        users_connected = data.get('users_connected')
+        self.assertEqual(users_connected, 1)
         
     def test_data_uploaded_per_day(self):
         response = self.client.get('/datacenter/data_uploaded_per_day', {})
