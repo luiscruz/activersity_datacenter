@@ -83,7 +83,10 @@ class UserWithExtraMethods(User):
     def position_timeline(self):
         sensor_data = self.data_from_sensor_with_type('position')
         return list(sensor_data.values('created_at', 'data'))
-
+        
+    def screen_activity_timeline(self):
+        sensor_data = self.data_from_sensor_with_type('screen activity')
+        return list(sensor_data.values('created_at', 'data'))
 
     def analytics(self):
         return {
@@ -91,6 +94,7 @@ class UserWithExtraMethods(User):
             "sensors_count": self.sensor_set.count(),
             "noise_timeline": self.noise_timeline(),
             "position_timeline": self.position_timeline(),
+            "screen_activity_timeline": self.screen_activity_timeline(),
         }
         pass
 
