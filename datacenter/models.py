@@ -61,6 +61,9 @@ class SensorData(models.Model):
     created_at = models.DateTimeField(default=timezone.now) #sensor read this value at this time
     data = JSONField()
     
+    class Meta:
+        ordering = ['created_at']
+    
 # Customize User model
 class UserWithExtraMethods(User):
     def to_dict(self, includeAnalytics = None):

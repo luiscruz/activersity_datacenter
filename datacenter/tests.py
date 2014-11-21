@@ -62,6 +62,22 @@ class UserMethodTests(TestCase):
         self.assertEqual(len(timeline), 1)
         self.assertEqual(timeline[0] ,{'created_at': sensordata.created_at, 'data':'{"value":-1}'})
         
+class SensorDataTests(TestCase):
+    def test_default_sensor_data_ordering(self):
+        test_user = create_user('username', 'password')
+        sensor = test_user.sensor_set.create(name = 'test_sensor', device_type = 'device_type')
+        
+        import datetime
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+        before_yesterday = yesterday - datetime.timedelta(days=1)
+        
+        sensor.sensordata_set.create(created_at= yesterday, data= -1)
+        sensor.sensordata_set.create(created_at= today, data= -1)
+        sensor.sensordata_set.create(created_at= before_yesterday, data= -1)
+
+        self.assertEqual(SensorData.objects.all()[0].created_at.day, before_yesterday.day)
+        self.assertEqual(SensorData.objects.all()[1].created_at.day, yesterday.day)
                 
 class RestApiTests(APITestCase):
     def test_login(self):
