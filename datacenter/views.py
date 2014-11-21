@@ -120,13 +120,12 @@ class SensorsDataView(View):
         request_data = json.loads(request.body).get('data')#request.POST.getlist('data')  
               
         if request_data is not None:
-
             for data_item in request_data:
                 created_at = data_item.get('created_at')
                 if created_at is None:
                     created_at = data_item.get('date')
                     if created_at is not None:
-                        created_at = date.fromtimestamp(float(created_at))
+                        created_at = datetime.fromtimestamp(float(created_at))
                     else:
                         created_at = timezone.now()
                 sensor.sensordata_set.create(data = data_item, created_at = created_at)
@@ -149,7 +148,7 @@ def upload_data_for_multiple_sensors(request, format = None):
                 if created_at is None:
                     created_at = data_item.get('date')
                     if created_at is not None:
-                        created_at = date.fromtimestamp(float(created_at))
+                        created_at = datetime.fromtimestamp(float(created_at))
                     else:
                         created_at = timezone.now()
                 sensor.sensordata_set.create(data = data_item, created_at = created_at)
