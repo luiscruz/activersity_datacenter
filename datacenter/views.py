@@ -206,7 +206,7 @@ def users_show(request, user_id, format = None):
         
         
 ############ Analytics ############
-def get_users_connected():
+def get_users_connected():###DEAD CODE - HELPER
     # Query all non-expired sessions
     sessions = Session.objects.filter(expire_date__gte=datetime.now())
     uid_list = []
@@ -219,7 +219,7 @@ def get_users_connected():
     # Query all logged in users based on id list
     return User.objects.filter(id__in=uid_list)
     
-def get_users_connected_count():
+def get_users_connected_count(): ### - HELPER
     # Query all non-expired sessions
     sessions = Session.objects.filter(expire_date__gte=datetime.now())
     return sessions.count()
