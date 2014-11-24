@@ -91,6 +91,10 @@ class UserWithExtraMethods(User):
         sensor_data = self.data_from_sensor_with_type('screen activity')
         return list(sensor_data.values('created_at', 'data'))
         
+    def accelerometer_timeline(self):
+        sensor_data = self.data_from_sensor_with_type('accelerometer')
+        return list(sensor_data.values('created_at', 'data'))
+        
     def devices_count(self):
         return self.sensor_set.distinct('device').count()
 
@@ -101,6 +105,7 @@ class UserWithExtraMethods(User):
             "noise_timeline": self.noise_timeline(),
             "position_timeline": self.position_timeline(),
             "screen_activity_timeline": self.screen_activity_timeline(),
+            "accelerometer_timeline": self.accelerometer_timeline(),
         }
         pass
 
