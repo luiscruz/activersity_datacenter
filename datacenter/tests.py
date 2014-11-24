@@ -62,6 +62,20 @@ class UserMethodTests(TestCase):
         self.assertEqual(len(timeline), 1)
         self.assertEqual(timeline[0] ,{'created_at': sensordata.created_at, 'data':'{"value":-1}'})
         
+    def test_devices_count(self):
+        test_user = create_user('teste', 'password')
+        test_user = UserWithExtraMethods.objects.get(id = test_user.id)
+        self.assertEqual(test_user.devices_count(), 0);
+        
+        sensor_name = 'sensor_test'
+        sensor = create_sensor(test_user, sensor_name)
+        device_type = 'iPhone Simulator'
+        device_uuid = '620A033F-4738-4319-AAC8-0F27B310AA82'
+        device = create_device(device_type, device_uuid)
+        device.sensor_set.add(sensor)
+        self.assertEqual(test_user.devices_count(), 1);
+        
+        
 class SensorDataTests(TestCase):
     def test_default_sensor_data_ordering(self):
         test_user = create_user('username', 'password')

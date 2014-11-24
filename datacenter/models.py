@@ -90,10 +90,13 @@ class UserWithExtraMethods(User):
     def screen_activity_timeline(self):
         sensor_data = self.data_from_sensor_with_type('screen activity')
         return list(sensor_data.values('created_at', 'data'))
+        
+    def devices_count(self):
+        return self.sensor_set.distinct('device').count()
 
     def analytics(self):
         return {
-            "devices_count": -1,
+            "devices_count": self.devices_count(),
             "sensors_count": self.sensor_set.count(),
             "noise_timeline": self.noise_timeline(),
             "position_timeline": self.position_timeline(),
