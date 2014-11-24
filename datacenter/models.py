@@ -69,7 +69,8 @@ class UserWithExtraMethods(User):
     def to_dict(self, includeAnalytics = None):
         instance_dict = {
             "email": self.email,
-            "username": self.username
+            "username": self.username,
+            "sensors": list(self.sensor_set.values()),
         }
         if(includeAnalytics):
             instance_dict['analytics'] = self.analytics()
