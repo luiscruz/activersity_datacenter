@@ -93,6 +93,7 @@ class UserWithExtraMethods(User):
         return list(sensor_data.values('created_at', 'data'))
         
     def accelerometer_timeline(self):
+        sensor_data = SensorData.objects.filter(sensor__user_id = self.id).filter(sensor__name = 'accelerometer')
         sensor_data = self.data_from_sensor_with_type('accelerometer')
         return list(sensor_data.values('created_at', 'data'))
         
