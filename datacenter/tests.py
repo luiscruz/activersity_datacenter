@@ -14,6 +14,15 @@ from django.contrib.auth.models import User
 def create_user(username, password):
     return User.objects.create_user(username, password = password)
     
+def set_as_superuser(user):
+    user.is_superuser = True
+    user.save()
+
+def create_superuser(username, password):
+    superuser = create_user(username, password)
+    set_as_superuser(superuser)
+    return superuser
+    
 def create_sensor(user, name):
     sensor = user.sensor_set.create(name = name)
     return sensor
@@ -102,7 +111,6 @@ class RestApiTests(APITestCase):
         json_data = json.dumps(data)
         response = self.client.post('/datacenter/login.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        #self.assertEqual(response.request.user, test_user)
         
     def test_wrong_login(self):
         username = 'teste'
@@ -348,11 +356,20 @@ class RestApiTests(APITestCase):
         #self.assertEqual(sensor.device_type, '1')
         
     def test_basic_analytics(self):
+        username = 'teste'
+        password = 'password'
+        test_user = create_superuser(username, password)
+        
+        response = self.client.get('/datacenter/basic_analytics', {})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        login = self.client.login(username = username, password = password)
         response = self.client.get('/datacenter/basic_analytics', {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
         data = json.loads(response.content)
         users_connected = data.get('users_connected')
-        self.assertEqual(users_connected, 0)
+        self.assertEqual(users_connected, 1)
         
         
     def test_basic_analytics_users_connected(self):
@@ -361,6 +378,11 @@ class RestApiTests(APITestCase):
         test_user = create_user(username, password)
         login = self.client.login(username = username, password = password)
         response = self.client.get('/datacenter/basic_analytics', {})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        set_as_superuser(test_user)        
+        response = self.client.get('/datacenter/basic_analytics', {})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
         data = json.loads(response.content)
         users_connected = data.get('users_connected')
         self.assertEqual(users_connected, 1)
@@ -370,6 +392,19 @@ class RestApiTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_users(self):
+        username = 'teste'
+        password = 'password'
+        test_user = create_user(username, password)
+        
+        response = self.client.get('/datacenter/users', {})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+        login = self.client.login(username = username, password = password)
+        response = self.client.get('/datacenter/users', {})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+        test_user.is_superuser = True
+        test_user.save()
         response = self.client.get('/datacenter/users', {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
@@ -378,6 +413,10 @@ class RestApiTests(APITestCase):
         password = 'password'  
         test_user = create_user(username, password)
         response = self.client.get('/datacenter/users/'+str(test_user.id), {})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        login = self.client.login(username = username, password = password)
+        response = self.client.get('/datacenter/users/'+str(test_user.id), {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
     
     

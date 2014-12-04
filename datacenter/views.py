@@ -37,6 +37,7 @@ def test(request, format = None):
 def login(request, format = None): 
 
     request_data = json.loads(request.body)
+    print request
     
     username = request_data.get('username')
     password = request_data.get('password')
@@ -83,7 +84,8 @@ class SensorsView(View):
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
             return JsonResponse({}, status = status.HTTP_401_UNAUTHORIZED)
-        request_data = json.loads(request.body).get('sensor')#request.POST.getlist('data')  
+        request_data = json.loads(request.body).get('sensor')
+        
         name = request_data.get('name')
         display_name = request_data.get('display_name')
         device_type = request_data.get('device_type')
@@ -181,6 +183,9 @@ def sensor_device(request, pk, format = None):
 @csrf_exempt
 def users(request, format = None):
     if request.method == 'GET':
+        user = request.user
+        if not (user.is_authenticated() and user.is_superuser):
+            return JsonResponse({}, status = status.HTTP_401_UNAUTHORIZED)
         users = User.objects.all().values()
         return JsonResponse({"users": list(users)})
         
@@ -224,6 +229,9 @@ def get_users_connected_count(): ### - HELPER
     return sessions.count()
 
 def basic_analytics(request, format = None):
+    print request
+    if not (request.user.is_authenticated() and request.user.is_superuser):
+        return JsonResponse({}, status = status.HTTP_401_UNAUTHORIZED)
     if request.method == 'GET':
         import numpy
         sensors_count = Sensor.objects.count()
