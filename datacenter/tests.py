@@ -16,6 +16,7 @@ def create_user(username, password):
     
 def set_as_superuser(user):
     user.is_superuser = True
+    user.is_staff = True
     user.save()
 
 def create_superuser(username, password):
@@ -403,7 +404,7 @@ class RestApiTests(APITestCase):
         response = self.client.get('/datacenter/users', {})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         
-        test_user.is_superuser = True
+        set_as_superuser(test_user)
         test_user.save()
         response = self.client.get('/datacenter/users', {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)

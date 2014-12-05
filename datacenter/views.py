@@ -27,8 +27,6 @@ from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 
 
-
-#GET
 def test(request, format = None):
     return HttpResponse('It is fine ;)')
 
@@ -184,7 +182,7 @@ def sensor_device(request, pk, format = None):
 def users(request, format = None):
     if request.method == 'GET':
         user = request.user
-        if not (user.is_authenticated() and user.is_superuser):
+        if not (user.is_authenticated() and user.is_staff):
             return JsonResponse({}, status = status.HTTP_401_UNAUTHORIZED)
         users = User.objects.all().values()
         return JsonResponse({"users": list(users)})
@@ -204,6 +202,8 @@ def users(request, format = None):
 def users_show(request, user_id, format = None):
     if request.method == 'GET':
         user = UserWithExtraMethods.objects.get(id=user_id)
+        if not (request.user.is_authenticated() and request.user.is_staff or user == request.user):
+            return JsonResponse({}, status = status.HTTP_401_UNAUTHORIZED)
         return JsonResponse({"user": user.to_dict(True)})
 
 ###################################        
@@ -229,8 +229,7 @@ def get_users_connected_count(): ### - HELPER
     return sessions.count()
 
 def basic_analytics(request, format = None):
-    print request
-    if not (request.user.is_authenticated() and request.user.is_superuser):
+    if not (request.user.is_authenticated() and request.user.is_staff):
         return JsonResponse({}, status = status.HTTP_401_UNAUTHORIZED)
     if request.method == 'GET':
         import numpy
