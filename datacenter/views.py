@@ -35,7 +35,6 @@ def test(request, format = None):
 def login(request, format = None): 
 
     request_data = json.loads(request.body)
-    print request
     
     username = request_data.get('username')
     password = request_data.get('password')
@@ -44,7 +43,8 @@ def login(request, format = None):
         if user.is_active:
             auth.login(request, user)
             # Redirect to a success page.
-            data = {'session_id': request.session.session_key}
+            user  = UserWithExtraMethods.objects.get(id = user.id)
+            data = {'session_id': request.session.session_key, 'user': user.to_dict()}
             return JsonResponse(data, status = status.HTTP_200_OK)
         else:
             # Return a 'disabled account' error message

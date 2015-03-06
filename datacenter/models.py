@@ -68,8 +68,10 @@ class SensorData(models.Model):
 class UserWithExtraMethods(User):
     def to_dict(self, includeAnalytics = None):
         instance_dict = {
+            "id": self.id,
             "email": self.email,
             "username": self.username,
+            'is_staff': self.is_staff,
             "sensors": list(self.sensor_set.values()),
         }
         if(includeAnalytics):

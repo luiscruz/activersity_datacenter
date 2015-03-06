@@ -112,6 +112,9 @@ class RestApiTests(APITestCase):
         json_data = json.dumps(data)
         response = self.client.post('/datacenter/login.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = json.loads(response.content)
+        self.assertEqual(data.get('user').get('id'), test_user.id)
+        self.assertFalse(data['user']['is_staff'])
         
     def test_wrong_login(self):
         username = 'teste'
