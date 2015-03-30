@@ -358,6 +358,15 @@ class RestApiTests(APITestCase):
         created_user = User.objects.get(username=username)
         self.assertEqual(created_user.profile.student_id, student_id)
         self.assertEqual(created_user.profile.institution, institution)
+        
+    def test_with_activersity_app_android_data(self):
+        user_data = {"user":
+            {"username":"ei06034@fe.up.pt","email":"ei06034@fe.up.pt","address":"","zipCode":"","name":"Luis","student_id":"student_id","surname":"cruz","password":"fe01ce2a7fbac8fafaed7c982a04e229","country":"PORTUGAL","institution":"feup","mobile":""}
+        }
+        json_data = json.dumps(user_data)
+        response = self.client.post('/datacenter/users.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Create user did not return 201')
+        
 
     def test_add_sensor_to_device(self):
         username = 'teste'
