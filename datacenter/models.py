@@ -115,3 +115,9 @@ class UserWithExtraMethods(User):
     class Meta:
         proxy=True
 
+# Profile - extra data for user
+class Profile(models.Model):
+    user = models.OneToOneField(User)
+    institution = models.CharField(max_length=200)
+    student_id = models.CharField(max_length=200)
+    

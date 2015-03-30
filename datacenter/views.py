@@ -191,11 +191,17 @@ def users(request, format = None):
         request_data = json.loads(request.body)
         user_data = request_data.get('user')
         if user_data is not None:
-            User.objects.create_user(
+            user = User.objects.create_user(
                 username = user_data.get('username'),
                 email = user_data.get('email'),
                 first_name = user_data.get('name') or '',
+                last_name = user_data.get('surname') or '',
                 password = user_data.get('password')
+            )
+            userProfile = Profile.objects.create(
+                user=user,
+                institution = user_data.get('institution') or '',
+                student_id = user_data.get('student_id') or ''
             )
         return HttpResponse('User registered!', status = status.HTTP_201_CREATED)
         

@@ -338,6 +338,27 @@ class RestApiTests(APITestCase):
         response = self.client.post('/datacenter/users.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Create user did not return 201')
         
+    def test_register_user_with_profile_fields(self):
+        username = 'janjager'
+        password = 'password'
+        student_id = '060509034'
+        institution = 'FEUP'
+        user_data = {
+            "user": {
+                "username": username,
+                "email": "jan@test.nl",
+                "password": password,
+                "student_id": student_id,
+                "institution": institution
+            }
+        }
+        json_data = json.dumps(user_data)
+        response = self.client.post('/datacenter/users.json', data = json_data, content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Create user did not return 201')
+        created_user = User.objects.get(username=username)
+        self.assertEqual(created_user.profile.student_id, student_id)
+        self.assertEqual(created_user.profile.institution, institution)
+
     def test_add_sensor_to_device(self):
         username = 'teste'
         password = 'password'
