@@ -191,8 +191,11 @@ def users(request, format = None):
         request_data = json.loads(request.body)
         user_data = request_data.get('user')
         if user_data is not None:
+            username = user_data.get('username')
+            if User.objects.filter(username=username).exists():
+                return HttpResponse('User already registered!', status = status.HTTP_409_CONFLICT)
             user = User.objects.create_user(
-                username = user_data.get('username'),
+                username = username,
                 email = user_data.get('email'),
                 first_name = user_data.get('name') or '',
                 last_name = user_data.get('surname') or '',
