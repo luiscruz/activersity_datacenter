@@ -102,6 +102,10 @@ class UserWithExtraMethods(User):
         sensor_data = self.data_from_sensor_with_type('foreground_app')
         return list(sensor_data.values('created_at', 'data'))
         
+    def unread_msg_app_timeline(self):
+        sensor_data = self.data_from_sensor_with_type('unread msg')
+        return list(sensor_data.values('created_at', 'data'))
+        
         
     def devices_count(self):
         return self.sensor_set.distinct('device').count()
@@ -115,6 +119,7 @@ class UserWithExtraMethods(User):
             "screen_activity_timeline": self.screen_activity_timeline(),
             "accelerometer_timeline": self.accelerometer_timeline(),
             "foreground_app_timeline": self.foreground_app_timeline(),
+            "unread_msg_app_timeline": self.unread_msg_app_timeline(),
         }
         pass
 
