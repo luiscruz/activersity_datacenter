@@ -98,6 +98,11 @@ class UserWithExtraMethods(User):
         sensor_data = SensorData.objects.filter(sensor__user_id = self.id).filter(sensor__name = 'accelerometer')
         return list(sensor_data.values('created_at', 'data'))
         
+    def foreground_app_timeline(self):
+        sensor_data = self.data_from_sensor_with_type('foreground_app')
+        return list(sensor_data.values('created_at', 'data'))
+        
+        
     def devices_count(self):
         return self.sensor_set.distinct('device').count()
 
@@ -109,6 +114,7 @@ class UserWithExtraMethods(User):
             "position_timeline": self.position_timeline(),
             "screen_activity_timeline": self.screen_activity_timeline(),
             "accelerometer_timeline": self.accelerometer_timeline(),
+            "foreground_app_timeline": self.foreground_app_timeline(),
         }
         pass
 
