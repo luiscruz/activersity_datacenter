@@ -115,6 +115,7 @@ class RestApiTests(APITestCase):
         data = json.loads(response.content)
         self.assertEqual(data.get('user').get('id'), test_user.id)
         self.assertFalse(data['user']['is_staff'])
+        self.assertIsNotNone(data.get('session-id'))
         
     def test_wrong_login(self):
         username = 'teste'

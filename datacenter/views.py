@@ -44,7 +44,7 @@ def login(request, format = None):
             auth.login(request, user)
             # Redirect to a success page.
             user  = UserWithExtraMethods.objects.get(id = user.id)
-            data = {'session_id': request.session.session_key, 'user': user.to_dict()}
+            data = {'session_id': request.session.session_key,'session-id': request.session.session_key, 'user': user.to_dict()}
             return JsonResponse(data, status = status.HTTP_200_OK)
         else:
             # Return a 'disabled account' error message
